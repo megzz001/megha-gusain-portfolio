@@ -1,0 +1,6 @@
+{
+  "name": "Megha Gusain Portfolio",
+  "description": "Professional full-stack portfolio for Megha Gusain featuring an interactive AI Resume Assistant chatbot and custom printable resume templates.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
