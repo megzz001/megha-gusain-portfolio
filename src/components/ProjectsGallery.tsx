@@ -1,11 +1,47 @@
-import { useState, KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, KeyboardEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ExternalLink, Github, Sparkles, BookOpen, X, Code2, ShieldAlert } from 'lucide-react';
+import { gsap, ScrollTrigger } from '../lib/gsap';
 import { PROJECTS } from '../data';
 import { Project } from '../types';
 
 export default function ProjectsGallery() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [previewBlocked, setPreviewBlocked] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  // Pin the section and scrub the track horizontally as the user scrolls vertically (desktop only)
+  useEffect(() => {
+    setPreviewBlocked(false);
+  }, [selectedProject?.id]);
+
+  useEffect(() => {
+    const mm = gsap.matchMedia();
+
+    mm.add('(min-width: 1024px)', () => {
+      const track = trackRef.current;
+      const section = sectionRef.current;
+      if (!track || !section) return;
+
+      const scrollDistance = track.scrollWidth - track.clientWidth;
+      if (scrollDistance <= 0) return;
+
+      const st = ScrollTrigger.create({
+        trigger: section,
+        start: 'top top+=88',
+        end: () => `+=${scrollDistance}`,
+        pin: true,
+        scrub: 1,
+        invalidateOnRefresh: true,
+        animation: gsap.to(track, { x: () => -scrollDistance, ease: 'none' }),
+      });
+
+      return () => st.kill();
+    });
+
+    return () => mm.revert();
+  }, []);
 
   // Keyboard accessibility: ESC key to close modal
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -20,7 +56,7 @@ export default function ProjectsGallery() {
       case "interview-prep":
         return (
           <svg className="w-full h-full text-brand-accent" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="400" height="240" fill="currentColor" fillOpacity="0.03" />
+            <rect width="400" height="300" fill="currentColor" fillOpacity="0.03" />
             {/* Mock Chat bubbles */}
             <rect x="30" y="30" width="220" height="40" rx="12" fill="currentColor" fillOpacity="0.08" />
             <circle cx="55" cy="50" r="10" fill="currentColor" fillOpacity="0.15" />
@@ -92,30 +128,41 @@ export default function ProjectsGallery() {
   };
 
   return (
-    <section id="projects" className="py-24 px-4 bg-neutral-50/40 dark:bg-neutral-900/10 border-t border-neutral-100 dark:border-neutral-950 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto">
+    <section id="projects" ref={sectionRef} className="py-24 lg:py-16 lg:min-h-screen lg:flex lg:flex-col lg:justify-center px-4 bg-neutral-900/10 border-t border-neutral-950 transition-colors duration-300 overflow-visible">
+      <div className="max-w-7xl mx-auto w-full">
 
         {/* Title block */}
         <div className="mb-16">
           <span className="text-xs font-mono font-bold uppercase tracking-widest text-brand-accent">
             Featured Works
           </span>
-          <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 dark:text-white mt-1">
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-white mt-1">
             Software & Automations
           </h2>
         </div>
 
-        {/* Asymmetric grid layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Horizontal-scroll track on desktop, swipeable row on mobile/tablet */}
+        <div
+          ref={trackRef}
+          className="flex gap-8 overflow-x-auto lg:overflow-visible pb-6 lg:pb-8 snap-x snap-mandatory lg:snap-none no-scrollbar lg:pl-1 lg:pr-6"
+        >
           {PROJECTS.map((project, idx) => (
             <div
               key={project.id}
-              className="flex flex-col h-full rounded-2xl border border-neutral-200 dark:border-brand-border-dark bg-white dark:bg-brand-card-dark shadow-sm hover:shadow-md transition-shadow group overflow-hidden"
+              className="flex flex-col h-full min-h-[520px] w-[85vw] sm:w-[420px] lg:w-[400px] shrink-0 snap-center rounded-2xl border border-brand-border-dark glass shadow-sm hover:shadow-md transition-shadow group overflow-hidden"
             >
-              {/* Visual SVG top segment */}
-              <div className="relative w-full aspect-[1.6] bg-neutral-100 dark:bg-neutral-950 flex items-center justify-center border-b border-neutral-200/50 dark:border-neutral-800/50">
-                {renderProjectVisual(project.id)}
-                <div className="absolute inset-0 bg-neutral-950/20 group-hover:bg-neutral-950/0 transition-all pointer-events-none" />
+              {/* Visual screenshot or SVG top segment */}
+              <div className="relative w-full aspect-[1.6] bg-neutral-100 dark:bg-neutral-950 flex items-center justify-center border-b border-neutral-200/50 dark:border-neutral-800/50 overflow-hidden">
+                {project.screenshotUrl ? (
+                  <img
+                    src={project.screenshotUrl}
+                    alt={`${project.title} screenshot`}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  renderProjectVisual(project.id)
+                )}
+                <div className="absolute inset-0 bg-neutral-950/16 group-hover:bg-neutral-950/0 transition-all pointer-events-none" />
               </div>
 
               {/* Main content body */}
@@ -153,14 +200,25 @@ export default function ProjectsGallery() {
                   </div>
 
                   {/* Trigger buttons */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={() => setSelectedProject(project)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 transition-colors"
+                      className="flex-1 min-w-[140px] flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-800 dark:text-neutral-200 transition-colors"
                     >
                       <BookOpen className="h-3.5 w-3.5" />
                       <span>Read Case Study</span>
                     </button>
+                    {project.demoUrl && (
+                      <a
+                        href={project.demoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border border-brand-accent/30 bg-brand-accent/10 text-brand-accent hover:bg-brand-accent/20 transition-colors"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        <span>Live Demo</span>
+                      </a>
+                    )}
                     {project.githubUrl && (
                       <a
                         href={project.githubUrl}
@@ -220,6 +278,17 @@ export default function ProjectsGallery() {
                 {/* Modal Body (Scrollable) */}
                 <div className="flex-1 overflow-y-auto py-6 space-y-6 pr-1">
 
+                  {/* Screenshot preview */}
+                  {selectedProject.screenshotUrl && (
+                    <div className="overflow-hidden rounded-3xl border border-neutral-200/70 dark:border-neutral-800/70 bg-neutral-950">
+                      <img
+                        src={selectedProject.screenshotUrl}
+                        alt={`${selectedProject.title} preview screenshot`}
+                        className="w-full max-h-[280px] object-cover"
+                      />
+                    </div>
+                  )}
+
                   {/* Metadata Row */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-neutral-50 dark:bg-neutral-950 font-mono text-xs">
                     <div>
@@ -235,6 +304,57 @@ export default function ProjectsGallery() {
                       <span className="font-semibold text-brand-teal">{selectedProject.tech[0]} &amp; {selectedProject.tech[1]}</span>
                     </div>
                   </div>
+
+                  {selectedProject.demoUrl && (
+                    <div className="rounded-2xl border border-neutral-200/70 dark:border-neutral-800/70 overflow-hidden bg-neutral-950/95 shadow-inner">
+                      <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-neutral-800/80">
+                        <div>
+                          <h4 className="text-[11px] font-mono uppercase tracking-wider text-brand-accent">Live Preview</h4>
+                          <p className="text-xs text-neutral-400">See the deployed experience directly in the browser.</p>
+                        </div>
+                        <a
+                          href={selectedProject.demoUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-brand-accent/30 bg-brand-accent/10 px-3 py-2 text-xs font-semibold text-brand-accent hover:bg-brand-accent/20 transition-colors"
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          <span>Open Demo</span>
+                        </a>
+                      </div>
+                      <div className="relative aspect-video bg-neutral-900">
+                        {previewBlocked ? (
+                          <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center text-sm text-neutral-400">
+                            <p>This demo may block direct embedding on its hosting platform.</p>
+                            <a href={selectedProject.demoUrl} target="_blank" rel="noreferrer" className="font-semibold text-brand-accent">
+                              Open it in a new tab instead
+                            </a>
+                          </div>
+                        ) : (
+                          <iframe
+                            src={selectedProject.demoUrl}
+                            title={`${selectedProject.title} preview`}
+                            loading="lazy"
+                            className="h-full w-full"
+                            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+                            onLoad={(event) => {
+                              try {
+                                const href = event.currentTarget.contentWindow?.location.href;
+                                if (!href || href === 'about:blank') {
+                                  setPreviewBlocked(true);
+                                } else {
+                                  setPreviewBlocked(false);
+                                }
+                              } catch {
+                                setPreviewBlocked(true);
+                              }
+                            }}
+                            onError={() => setPreviewBlocked(true)}
+                          />
+                        )}                        $env:PORT=3001; npm run dev                        $env:PORT=3001; npm run dev
+                      </div>
+                    </div>
+                  )}
 
                   {/* Problem & Solution block */}
                   <div className="space-y-4">
@@ -292,13 +412,24 @@ export default function ProjectsGallery() {
                 </div>
 
                 {/* Footer Section */}
-                <div className="flex items-center gap-4 pt-4 border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-brand-card-dark">
+                <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-neutral-100 dark:border-neutral-800 bg-white dark:bg-brand-card-dark">
+                  {selectedProject.demoUrl && (
+                    <a
+                      href={selectedProject.demoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex-1 min-w-[160px] flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold border border-brand-accent/30 bg-brand-accent/10 text-brand-accent hover:bg-brand-accent/20 transition-colors"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      <span>Open Live Demo</span>
+                    </a>
+                  )}
                   {selectedProject.githubUrl && (
                     <a
                       href={selectedProject.githubUrl}
                       target="_blank"
                       referrerPolicy="no-referrer"
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+                      className="flex-1 min-w-[160px] flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
                     >
                       <Github className="h-4 w-4" />
                       <span>View Codebase</span>

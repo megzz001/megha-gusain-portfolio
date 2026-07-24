@@ -1,6 +1,8 @@
 import { motion, type Variants } from 'motion/react';
 import { ArrowDown, ArrowRight, Github, Linkedin, Code, Sparkles } from 'lucide-react';
 import { ME_INFO, PROJECTS, CERTIFICATIONS } from '../data';
+import FloatingTechIcons from './effects/FloatingTechIcons';
+import CircularBadge from './effects/CircularBadge';
 
 interface HeroProps {
   onChatClick: () => void;
@@ -29,10 +31,13 @@ export default function Hero({ onChatClick }: HeroProps) {
   };
 
   return (
-    <section id="hero" className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center py-20 px-4 overflow-hidden no-print">
+    <section id="hero" className="relative min-h-screen flex items-center justify-center py-20 px-4 overflow-hidden no-print">
       {/* Decorative tech background elements */}
       <div className="absolute top-1/4 left-1/10 w-72 h-72 rounded-full bg-brand-accent/5 dark:bg-brand-accent/10 blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/10 w-96 h-96 rounded-full bg-brand-teal/5 dark:bg-brand-teal/10 blur-3xl pointer-events-none" />
+
+      {/* Floating brand tech icons */}
+      <FloatingTechIcons />
 
       <div className="max-w-5xl mx-auto w-full relative z-10">
         <motion.div
@@ -158,6 +163,15 @@ export default function Hero({ onChatClick }: HeroProps) {
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
               className="relative w-full max-w-sm aspect-square md:aspect-[4/3] lg:aspect-square rounded-2xl bg-gradient-to-br from-brand-accent/40 via-neutral-200/40 dark:via-brand-border-dark/40 to-brand-teal/40 p-px shadow-xl hover:shadow-2xl hover:shadow-brand-accent/20 transition-shadow"
             >
+              {/* Decorative circular rotating badge, anchored to the card's own corner so it never overlaps its content */}
+              <div className="hidden lg:block absolute bottom-25 right-20 translate-x-full translate-y-full z-20">
+                <CircularBadge
+                  centerText={`${PROJECTS.length}+`}
+                  centerLabel="Projects Shipped & Counting"
+                  size={130}
+                />
+              </div>
+
               <div className="relative h-full w-full rounded-2xl bg-white/60 dark:bg-brand-card-dark/60 backdrop-blur-md p-6">
                 {/* Outer visual decor */}
                 <div className="absolute top-0 right-0 transform translate-x-3 -translate-y-3 p-2 bg-brand-teal/10 rounded-full text-brand-teal">

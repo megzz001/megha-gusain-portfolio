@@ -1,5 +1,7 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
-import { Send, CheckCircle2, AlertCircle, Mail, MessageSquare, Tag, User, Loader2 } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { Send, CheckCircle2, AlertCircle, Mail, MessageSquare, Tag, User, Loader2, X } from 'lucide-react';
+import Reveal from './effects/Reveal';
 
 interface FormState {
   name: string;
@@ -8,19 +10,13 @@ interface FormState {
   message: string;
 }
 
+const EMPTY_FORM: FormState = { name: '', email: '', subject: '', message: '' };
+
 export default function ContactForm() {
-  const [form, setForm] = useState<FormState>({
-    name: "",
-    email: "",
-    subject: "",
-    message: ""
-  });
+  const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  
-  // Track messages sent during this session to display in the UI "Outbox"
-  const [sessionOutbox, setSessionOutbox] = useState<any[]>([]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm(prev => ({
@@ -32,7 +28,6 @@ export default function ContactForm() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setSuccessMsg(null);
     setErrorMsg(null);
 
     // Basic Validation
@@ -55,24 +50,7 @@ export default function ContactForm() {
 
       if (response.ok && data.success) {
         setSuccessMsg(data.message || "Your message has been delivered!");
-        
-        // Add to local outbox log to prove physical delivery to backend API
-        setSessionOutbox(prev => [
-          {
-            id: Date.now().toString(),
-            ...form,
-            timestamp: new Date().toLocaleTimeString()
-          },
-          ...prev
-        ]);
-
-        // Reset form inputs
-        setForm({
-          name: "",
-          email: "",
-          subject: "",
-          message: ""
-        });
+        setForm(EMPTY_FORM);
       } else {
         setErrorMsg(data.error || "Something went wrong on the server. Please try again.");
       }
@@ -85,83 +63,30 @@ export default function ContactForm() {
   };
 
   return (
-    <section id="contact" className="py-24 px-4 bg-neutral-50/40 dark:bg-neutral-900/10 border-t border-neutral-100 dark:border-neutral-950 transition-colors duration-300 no-print">
-      <div className="max-w-7xl mx-auto">
-        
+    <section id="contact" className="py-24 px-4 bg-neutral-900/10 border-t border-neutral-950 transition-colors duration-300 no-print">
+      <div className="max-w-3xl mx-auto">
+
         {/* Header Title */}
-        <div className="mb-16">
+        <Reveal className="mb-16 text-center">
           <span className="text-xs font-mono font-bold uppercase tracking-widest text-brand-accent">
             Inquiries
           </span>
-          <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 dark:text-white mt-1">
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-white mt-1">
             Let's Collaborate
           </h2>
-        </div>
+          <p className="text-sm text-slate-400 mt-3 max-w-lg mx-auto leading-relaxed">
+            If you are a recruiter, startup founder, or engineering leader seeking highly automated workflows and reliable web architectures, reach out directly below.
+          </p>
+        </Reveal>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          
-          {/* Contact Details Column (col-span-5) */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="p-6 rounded-2xl border border-neutral-200 dark:border-brand-border-dark bg-white dark:bg-brand-card-dark shadow-sm">
-              <h3 className="font-display font-bold text-lg text-neutral-900 dark:text-white mb-4">
-                Direct Contact Lines
-              </h3>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed mb-6 font-normal">
-                If you are a recruiter, startup founder, or engineering leader seeking highly automated workflows and reliable web architectures, reach out directly.
-              </p>
-
-              <div className="space-y-4 font-mono text-xs">
-                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-950 text-neutral-700 dark:text-neutral-300">
-                  <Mail className="h-4 w-4 text-brand-accent" />
-                  <span>meghagusain03@gmail.com</span>
-                </div>
-                <div className="flex items-center gap-3 p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-950 text-neutral-700 dark:text-neutral-300">
-                  <User className="h-4 w-4 text-brand-teal" />
-                  <span>+91 98884 27804</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Live Outbox Monitor Card */}
-            {sessionOutbox.length > 0 && (
-              <div className="p-6 rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-800 bg-neutral-100/40 dark:bg-neutral-950/20 shadow-inner">
-                <h4 className="font-mono text-[10px] font-bold text-brand-teal uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-brand-teal" />
-                  <span>Backend Inbox Outbox Log</span>
-                </h4>
-                <div className="space-y-2.5 max-h-[160px] overflow-y-auto pr-1">
-                  {sessionOutbox.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className="p-3 rounded-lg border border-neutral-200/50 dark:border-neutral-800 bg-white dark:bg-brand-card-dark font-mono text-[10px] space-y-1"
-                    >
-                      <div className="flex justify-between items-center text-[9px] text-neutral-400">
-                        <span className="font-bold text-neutral-600 dark:text-neutral-300">{msg.name}</span>
-                        <span>{msg.timestamp}</span>
-                      </div>
-                      <div className="text-neutral-500 dark:text-neutral-400 line-clamp-1">{msg.message}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Form Fields Column (col-span-7) */}
+        {/* Form */}
+        <Reveal y={40}>
           <form
             onSubmit={handleSubmit}
-            className="lg:col-span-7 p-6 sm:p-8 rounded-2xl border border-neutral-200 dark:border-brand-border-dark bg-white dark:bg-brand-card-dark shadow-sm space-y-5"
+            className="p-6 sm:p-8 rounded-2xl glass shadow-sm space-y-5"
           >
-            {/* Success and Error Indicators */}
-            {successMsg && (
-              <div className="flex items-center gap-2.5 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm">
-                <CheckCircle2 className="h-5 w-5 flex-shrink-0" />
-                <span>{successMsg}</span>
-              </div>
-            )}
-
             {errorMsg && (
-              <div className="flex items-center gap-2.5 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-sm">
+              <div className="flex items-center gap-2.5 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
                 <AlertCircle className="h-5 w-5 flex-shrink-0" />
                 <span>{errorMsg}</span>
               </div>
@@ -184,7 +109,7 @@ export default function ContactForm() {
                     onChange={handleChange}
                     required
                     placeholder="Jane Doe"
-                    className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30 text-sm focus:outline-none focus:border-brand-accent focus:bg-white dark:focus:bg-brand-card-dark transition-all text-neutral-800 dark:text-neutral-200"
+                    className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-900/30 text-sm focus:outline-none focus:border-brand-accent focus:bg-brand-card-dark transition-all text-neutral-200"
                   />
                 </div>
               </div>
@@ -204,7 +129,7 @@ export default function ContactForm() {
                     onChange={handleChange}
                     required
                     placeholder="jane@example.com"
-                    className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30 text-sm focus:outline-none focus:border-brand-accent focus:bg-white dark:focus:bg-brand-card-dark transition-all text-neutral-800 dark:text-neutral-200"
+                    className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-900/30 text-sm focus:outline-none focus:border-brand-accent focus:bg-brand-card-dark transition-all text-neutral-200"
                   />
                 </div>
               </div>
@@ -225,7 +150,7 @@ export default function ContactForm() {
                   value={form.subject}
                   onChange={handleChange}
                   placeholder="Opportunity description"
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30 text-sm focus:outline-none focus:border-brand-accent focus:bg-white dark:focus:bg-brand-card-dark transition-all text-neutral-800 dark:text-neutral-200"
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-900/30 text-sm focus:outline-none focus:border-brand-accent focus:bg-brand-card-dark transition-all text-neutral-200"
                 />
               </div>
             </div>
@@ -246,7 +171,7 @@ export default function ContactForm() {
                   required
                   rows={4}
                   placeholder="Type your message here..."
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30 text-sm focus:outline-none focus:border-brand-accent focus:bg-white dark:focus:bg-brand-card-dark transition-all text-neutral-800 dark:text-neutral-200"
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-900/30 text-sm focus:outline-none focus:border-brand-accent focus:bg-brand-card-dark transition-all text-neutral-200"
                 />
               </div>
             </div>
@@ -255,7 +180,7 @@ export default function ContactForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold bg-brand-accent hover:bg-brand-accent/90 disabled:bg-neutral-300 dark:disabled:bg-neutral-800 text-white transition-all shadow-md shadow-brand-accent/15 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold bg-brand-accent hover:bg-brand-accent/90 disabled:bg-neutral-800 text-white transition-all shadow-md shadow-brand-accent/15 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -270,10 +195,49 @@ export default function ContactForm() {
               )}
             </button>
           </form>
-
-        </div>
+        </Reveal>
 
       </div>
+
+      {/* Success Popup */}
+      <AnimatePresence>
+        {successMsg && (
+          <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <div className="absolute inset-0" onClick={() => setSuccessMsg(null)} />
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 15 }}
+              transition={{ type: 'spring', damping: 22, stiffness: 260 }}
+              className="relative w-full max-w-sm glass rounded-2xl p-8 text-center shadow-2xl z-10"
+              role="alertdialog"
+              aria-modal="true"
+            >
+              <button
+                onClick={() => setSuccessMsg(null)}
+                className="absolute top-3 right-3 p-1.5 rounded-full text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
+
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
+                <CheckCircle2 className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-display font-bold text-white mb-2">Message Sent!</h3>
+              <p className="text-sm text-slate-400 leading-relaxed">{successMsg}</p>
+
+              <button
+                onClick={() => setSuccessMsg(null)}
+                className="mt-6 w-full py-2.5 rounded-xl font-semibold bg-brand-accent hover:bg-brand-accent/90 text-white transition-colors"
+              >
+                Close
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

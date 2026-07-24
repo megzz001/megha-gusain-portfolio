@@ -1,12 +1,17 @@
+import "dotenv/config";
 import express from "express";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
+import { Resend } from "resend";
 
-const PORT = 3000;
-const HOST = "127.0.0.1";
+const PORT = Number(process.env.PORT || 3000);
+const HOST = process.env.HOST || "127.0.0.1";
+const HMR_PORT = Number(process.env.HMR_PORT || 24678);
 const MESSAGES_FILE = path.join(process.cwd(), "messages.json");
+const CONTACT_RECIPIENT_EMAIL = process.env.CONTACT_RECIPIENT_EMAIL || "meghagusain03@gmail.com";
+const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "Portfolio Contact Form <onboarding@resend.dev>";
 
 // Lazy-initialized Gemini Client
 let aiClient: GoogleGenAI | null = null;
@@ -27,6 +32,20 @@ function getGeminiClient(): GoogleGenAI {
     });
   }
   return aiClient;
+}
+
+// Lazy-initialized Resend Client (transactional email for the contact form)
+let resendClient: Resend | null = null;
+
+function getResendClient(): Resend {
+  if (!resendClient) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error("RESEND_API_KEY environment variable is not configured.");
+    }
+    resendClient = new Resend(apiKey);
+  }
+  return resendClient;
 }
 
 async function startServer() {
@@ -62,6 +81,31 @@ async function startServer() {
 
       existingMessages.push(newMessage);
       fs.writeFileSync(MESSAGES_FILE, JSON.stringify(existingMessages, null, 2));
+
+      // Deliver the message to Megha's inbox via Resend when the API key is available.
+      if (process.env.RESEND_API_KEY) {
+        try {
+          const resend = getResendClient();
+          await resend.emails.send({
+            from: RESEND_FROM_EMAIL,
+            to: CONTACT_RECIPIENT_EMAIL,
+            replyTo: email,
+            subject: `New portfolio inquiry: ${newMessage.subject}`,
+            html: `
+              <h2>New message from your portfolio contact form</h2>
+              <p><strong>Name:</strong> ${name}</p>
+              <p><strong>Email:</strong> ${email}</p>
+              <p><strong>Subject:</strong> ${newMessage.subject}</p>
+              <p><strong>Message:</strong></p>
+              <p>${message.replace(/\n/g, "<br />")}</p>
+            `,
+          });
+        } catch (emailError: any) {
+          console.error("Error sending contact email via Resend:", emailError);
+        }
+      } else {
+        console.warn("RESEND_API_KEY is not configured; email delivery skipped.");
+      }
 
       return res.json({
         success: true,
@@ -157,7 +201,10 @@ Conversational Rules:
   if (process.env.NODE_ENV !== "production") {
     console.log("Setting up Vite server in development mode...");
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: { port: HMR_PORT },
+      },
       appType: "spa",
     });
     app.use(vite.middlewares);

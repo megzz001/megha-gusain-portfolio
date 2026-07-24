@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
-/* Force dark: utilities to key off the .dark class (theme toggle), not OS preference */
+/* Fixed dark cosmic theme: .dark is always applied at the document root */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
@@ -10,7 +10,7 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
   /* Custom palette definitions */
-  --color-brand-bg-dark: #090a0f;
+  --color-brand-bg-dark: #0a0a0a;
   --color-brand-card-dark: #121420;
   --color-brand-border-dark: #1f2335;
   --color-brand-accent: #6366f1; /* Indigo */
@@ -64,11 +64,11 @@
 
 .dark {
   --background: 0 0% 3.9%;
-  --foreground: 0 0% 98%;
+  --foreground: 210 40% 96.1%;
   --card: 0 0% 3.9%;
-  --card-foreground: 0 0% 98%;
+  --card-foreground: 210 40% 96.1%;
   --popover: 0 0% 3.9%;
-  --popover-foreground: 0 0% 98%;
+  --popover-foreground: 210 40% 96.1%;
   --primary: 0 0% 98%;
   --primary-foreground: 0 0% 9%;
   --secondary: 0 0% 14.9%;
@@ -89,10 +89,88 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Offset in-page anchor scrolling for the fixed navbar */
+#hero, #about, #skills, #projects, #timeline, #contact {
+  scroll-margin-top: 6rem;
+}
+
 body {
   font-family: var(--font-sans);
   overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
+  color: #e2e8f0;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #4f46e5;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6366f1;
+}
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #4f46e5 #0a0a0a;
+}
+
+/* Hide native cursor for pointer-fine devices once the custom cursor mounts */
+@media (hover: hover) and (pointer: fine) {
+  body.custom-cursor-active,
+  body.custom-cursor-active a,
+  body.custom-cursor-active button,
+  body.custom-cursor-active [role="button"] {
+    cursor: none;
+  }
+}
+
+/* Hide scrollbar for horizontally swiped rows while keeping scroll functional */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(17, 24, 39, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Skills marquee */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+
+/* Floating hero tech icons */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+.animate-float {
+  animation: float 5s ease-in-out infinite;
 }
 
 /* Custom subtle grid backgrounds */

@@ -31,7 +31,7 @@ const itemVariants: Variants = {
 
 export default function SkillsDashboard() {
   return (
-    <section id="skills" className="py-24 px-4 bg-white dark:bg-brand-bg-dark border-t border-neutral-100 dark:border-neutral-950 transition-colors duration-300">
+    <section id="skills" className="py-24 px-4 bg-brand-bg-dark/60 border-t border-neutral-950 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
 
         {/* Section Heading */}

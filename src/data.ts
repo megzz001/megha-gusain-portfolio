@@ -37,6 +37,8 @@ export const PROJECTS: Project[] = [
     ],
     role: "Full-Stack Developer / Prompt Engineer",
     period: "2026",
+    demoUrl: "https://full-stack-ai-resume-analyzer-and-coic.onrender.com/",
+    screenshotUrl: "https://s.wordpress.com/mshots/v1/https://full-stack-ai-resume-analyzer-and-coic.onrender.com/?w=1200",
     githubUrl: "https://github.com/megzz001/Full-Stack-AI-Resume-Analyzer-and-Interview-Question-Generator-using-GenAI"
   },
   {
@@ -58,6 +60,8 @@ export const PROJECTS: Project[] = [
     ],
     role: "Full-Stack Developer",
     period: "Feb 2026 – Mar 2026",
+    demoUrl: "https://cloudware-hierarchical-file-management-d0xj.onrender.com/",
+    screenshotUrl: "https://s.wordpress.com/mshots/v1/https://cloudware-hierarchical-file-management-d0xj.onrender.com/?w=1200",
     githubUrl: "https://github.com/megzz001/cloudware-Hierarchical-File-Management-System"
   },
   {

@@ -7,6 +7,7 @@ export interface Project {
   role?: string;
   period?: string;
   demoUrl?: string;
+  screenshotUrl?: string;
   githubUrl?: string;
   highlights: string[];
 }
