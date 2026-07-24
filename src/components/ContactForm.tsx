@@ -1,6 +1,5 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
-import { Send, CheckCircle2, AlertCircle, Mail, MessageSquare, Tag, User, Loader2, X } from 'lucide-react';
+import { Send, CheckCircle2, AlertCircle, Mail, MessageSquare, Tag, User, Loader2 } from 'lucide-react';
 import Reveal from './effects/Reveal';
 
 interface FormState {
@@ -25,10 +24,12 @@ export default function ContactForm() {
     }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     setLoading(true);
     setErrorMsg(null);
+    setSuccessMsg(null);
 
     // Basic Validation
     if (!form.name || !form.email || !form.message) {
@@ -108,7 +109,7 @@ export default function ContactForm() {
                     value={form.name}
                     onChange={handleChange}
                     required
-                    placeholder="Jane Doe"
+                    placeholder="Megha"
                     className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-900/30 text-sm focus:outline-none focus:border-brand-accent focus:bg-brand-card-dark transition-all text-neutral-200"
                   />
                 </div>
@@ -128,7 +129,7 @@ export default function ContactForm() {
                     value={form.email}
                     onChange={handleChange}
                     required
-                    placeholder="jane@example.com"
+                    placeholder="megha@gmail.com"
                     className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-neutral-800 bg-neutral-900/30 text-sm focus:outline-none focus:border-brand-accent focus:bg-brand-card-dark transition-all text-neutral-200"
                   />
                 </div>
@@ -176,6 +177,13 @@ export default function ContactForm() {
               </div>
             </div>
 
+            {successMsg && (
+              <div className="flex items-center gap-2.5 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
+                <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-400" />
+                <span>{successMsg}</span>
+              </div>
+            )}
+
             {/* Submission Button */}
             <button
               type="submit"
@@ -198,46 +206,6 @@ export default function ContactForm() {
         </Reveal>
 
       </div>
-
-      {/* Success Popup */}
-      <AnimatePresence>
-        {successMsg && (
-          <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <div className="absolute inset-0" onClick={() => setSuccessMsg(null)} />
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 15 }}
-              transition={{ type: 'spring', damping: 22, stiffness: 260 }}
-              className="relative w-full max-w-sm glass rounded-2xl p-8 text-center shadow-2xl z-10"
-              role="alertdialog"
-              aria-modal="true"
-            >
-              <button
-                onClick={() => setSuccessMsg(null)}
-                className="absolute top-3 right-3 p-1.5 rounded-full text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
-                aria-label="Close"
-              >
-                <X className="h-4 w-4" />
-              </button>
-
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
-                <CheckCircle2 className="h-8 w-8" />
-              </div>
-              <h3 className="text-xl font-display font-bold text-white mb-2">Message Sent!</h3>
-              <p className="text-sm text-slate-400 leading-relaxed">{successMsg}</p>
-
-              <button
-                onClick={() => setSuccessMsg(null)}
-                className="mt-6 w-full py-2.5 rounded-xl font-semibold bg-brand-accent hover:bg-brand-accent/90 text-white transition-colors"
-              >
-                Close
-              </button>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </section>
   );
 }
