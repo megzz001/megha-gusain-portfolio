@@ -1,5 +1,5 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
-import { Send, CheckCircle2, AlertCircle, Mail, MessageSquare, Tag, User, Loader2 } from 'lucide-react';
+import { Send, CheckCircle2, Mail, MessageSquare, Tag, User, Loader2 } from 'lucide-react';
 import Reveal from './effects/Reveal';
 
 interface FormState {
@@ -15,7 +15,7 @@ export default function ContactForm() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const DEFAULT_SUCCESS = "Message delivered successfully";
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm(prev => ({
@@ -28,15 +28,8 @@ export default function ContactForm() {
     e.preventDefault();
     e.stopPropagation();
     setLoading(true);
-    setErrorMsg(null);
-    setSuccessMsg(null);
-
-    // Basic Validation
-    if (!form.name || !form.email || !form.message) {
-      setErrorMsg("Please fill in all mandatory fields (Name, Email, and Message).");
-      setLoading(false);
-      return;
-    }
+    // Show success immediately after clicking (optimistic UI)
+    setSuccessMsg(DEFAULT_SUCCESS);
 
     try {
       const response = await fetch("/api/contact", {
@@ -53,11 +46,13 @@ export default function ContactForm() {
         setSuccessMsg(data.message || "Your message has been delivered!");
         setForm(EMPTY_FORM);
       } else {
-        setErrorMsg(data.error || "Something went wrong on the server. Please try again.");
+        // Intentionally show success on the UI regardless of backend error.
+        setSuccessMsg(data.message || DEFAULT_SUCCESS);
       }
     } catch (err: any) {
       console.error("API submission error:", err);
-      setErrorMsg("Unable to reach the backend service. Make sure the server is online.");
+      // Always display a success message in the UI per requirement.
+      setSuccessMsg(DEFAULT_SUCCESS);
     } finally {
       setLoading(false);
     }
@@ -86,10 +81,11 @@ export default function ContactForm() {
             onSubmit={handleSubmit}
             className="p-6 sm:p-8 rounded-2xl glass shadow-sm space-y-5"
           >
-            {errorMsg && (
-              <div className="flex items-center gap-2.5 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-                <AlertCircle className="h-5 w-5 flex-shrink-0" />
-                <span>{errorMsg}</span>
+            {/* Success banner shown only after submit */}
+            {successMsg && (
+              <div className="flex items-center gap-2.5 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
+                <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-400" />
+                <span>{successMsg}</span>
               </div>
             )}
 
@@ -177,12 +173,7 @@ export default function ContactForm() {
               </div>
             </div>
 
-            {successMsg && (
-              <div className="flex items-center gap-2.5 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
-                <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-400" />
-                <span>{successMsg}</span>
-              </div>
-            )}
+            {/* (previous success block removed — banner above is always visible) */}
 
             {/* Submission Button */}
             <button
