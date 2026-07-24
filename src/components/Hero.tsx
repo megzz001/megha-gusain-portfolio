@@ -1,6 +1,6 @@
-import { motion } from 'motion/react';
-import { ArrowDown, Github, Linkedin, Code, MessageSquare, Sparkles } from 'lucide-react';
-import { ME_INFO } from '../data';
+import { motion, type Variants } from 'motion/react';
+import { ArrowDown, ArrowRight, Github, Linkedin, Code, Sparkles } from 'lucide-react';
+import { ME_INFO, PROJECTS, CERTIFICATIONS } from '../data';
 
 interface HeroProps {
   onChatClick: () => void;
@@ -8,7 +8,7 @@ interface HeroProps {
 
 export default function Hero({ onChatClick }: HeroProps) {
   // Stagger parameters for landing animation
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -19,7 +19,7 @@ export default function Hero({ onChatClick }: HeroProps) {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 25 },
     visible: {
       opacity: 1,
@@ -116,9 +116,10 @@ export default function Hero({ onChatClick }: HeroProps) {
             <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto pt-4">
               <a
                 href="#projects"
-                className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors"
+                className="group flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors"
               >
                 <span>Explore Projects</span>
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </a>
               <button
                 onClick={onChatClick}
@@ -128,59 +129,82 @@ export default function Hero({ onChatClick }: HeroProps) {
                 <span>Chat with Megha's AI Twin</span>
               </button>
             </motion.div>
+
+            {/* Quick Stats */}
+            <motion.div
+              variants={itemVariants}
+              className="grid grid-cols-3 gap-4 sm:gap-8 w-full max-w-md pt-6 mt-2 border-t border-neutral-200 dark:border-neutral-800"
+            >
+              <div>
+                <p className="text-2xl sm:text-3xl font-display font-bold text-neutral-900 dark:text-white">7.59</p>
+                <p className="text-xs font-mono text-neutral-500 dark:text-neutral-400 mt-1">CGPA</p>
+              </div>
+              <div>
+                <p className="text-2xl sm:text-3xl font-display font-bold text-neutral-900 dark:text-white">{PROJECTS.length}+</p>
+                <p className="text-xs font-mono text-neutral-500 dark:text-neutral-400 mt-1">Projects Shipped</p>
+              </div>
+              <div>
+                <p className="text-2xl sm:text-3xl font-display font-bold text-neutral-900 dark:text-white">{CERTIFICATIONS.length}</p>
+                <p className="text-xs font-mono text-neutral-500 dark:text-neutral-400 mt-1">Certifications</p>
+              </div>
+            </motion.div>
           </div>
 
           {/* Right Visual Card (asymmetric grid / visual mockup) */}
           <div className="lg:col-span-5 flex justify-center">
             <motion.div
               variants={itemVariants}
-              className="relative w-full max-w-sm aspect-square md:aspect-[4/3] lg:aspect-square rounded-2xl border border-neutral-200 dark:border-brand-border-dark bg-white/40 dark:bg-brand-card-dark/40 backdrop-blur-md p-6 shadow-xl"
+              whileHover={{ y: -6 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              className="relative w-full max-w-sm aspect-square md:aspect-[4/3] lg:aspect-square rounded-2xl bg-gradient-to-br from-brand-accent/40 via-neutral-200/40 dark:via-brand-border-dark/40 to-brand-teal/40 p-px shadow-xl hover:shadow-2xl hover:shadow-brand-accent/20 transition-shadow"
             >
-              {/* Outer visual decor */}
-              <div className="absolute top-0 right-0 transform translate-x-3 -translate-y-3 p-2 bg-brand-teal/10 rounded-full text-brand-teal">
-                <Sparkles className="h-5 w-5" />
-              </div>
-
-              {/* Code window mock */}
-              <div className="flex flex-col h-full font-mono text-xs">
-                <div className="flex items-center gap-1.5 border-b border-neutral-200 dark:border-neutral-800 pb-3 mb-4">
-                  <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
-                  <span className="text-[10px] text-neutral-400 ml-2">megha.config.json</span>
+              <div className="relative h-full w-full rounded-2xl bg-white/60 dark:bg-brand-card-dark/60 backdrop-blur-md p-6">
+                {/* Outer visual decor */}
+                <div className="absolute top-0 right-0 transform translate-x-3 -translate-y-3 p-2 bg-brand-teal/10 rounded-full text-brand-teal">
+                  <Sparkles className="h-5 w-5" />
                 </div>
-                <div className="flex-1 space-y-3 overflow-y-auto">
-                  <div>
-                    <span className="text-indigo-400">const</span> <span className="text-teal-400">engineer</span> = &#123;
-                  </div>
-                  <div className="pl-4">
-                    <span className="text-neutral-400">education:</span> <span className="text-amber-400">"Chandigarh University"</span>,
-                  </div>
-                  <div className="pl-4">
-                    <span className="text-neutral-400">cgpa:</span> <span className="text-indigo-300">7.59</span>,
-                  </div>
-                  <div className="pl-4">
-                    <span className="text-neutral-400">coreStack:</span> [
-                    <span className="text-amber-400">"Java"</span>, <span className="text-amber-400">"React"</span>, <span className="text-amber-400">"Express"</span>
-                    ],
-                  </div>
-                  <div className="pl-4">
-                    <span className="text-neutral-400">focusAreas:</span> [
-                    <span className="text-amber-400">"Full-Stack APIs"</span>, <span className="text-amber-400">"AI Agents"</span>
-                    ],
-                  </div>
-                  <div className="pl-4">
-                    <span className="text-neutral-400">passionateAbout:</span> <span className="text-amber-400">"Scale, Automation & Clean Architecture"</span>
-                  </div>
-                  <div>&#125;;</div>
 
-                  <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800">
-                    <div className="text-emerald-500 font-bold flex items-center gap-1">
-                      <span>&gt;</span>
-                      <span className="animate-pulse">n8n run automations --active</span>
+                {/* Code window mock */}
+                <div className="flex flex-col h-full font-mono text-xs">
+                  <div className="flex items-center gap-1.5 border-b border-neutral-200 dark:border-neutral-800 pb-3 mb-4">
+                    <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
+                    <span className="text-[10px] text-neutral-500 dark:text-neutral-400 ml-2">megha.config.json</span>
+                  </div>
+                  <div className="flex-1 space-y-3 overflow-y-auto">
+                    <div>
+                      <span className="text-indigo-400">const</span> <span className="text-teal-400">engineer</span> = &#123;
                     </div>
-                    <div className="text-[10px] text-neutral-400 mt-1">
-                      [INFO] 3 autonomous workflows listening ...
+                    <div className="pl-4">
+                      <span className="text-neutral-500 dark:text-neutral-400">education:</span> <span className="text-amber-500 dark:text-amber-400">"Chandigarh University"</span>,
+                    </div>
+                    <div className="pl-4">
+                      <span className="text-neutral-500 dark:text-neutral-400">cgpa:</span> <span className="text-indigo-500 dark:text-indigo-300">7.59</span>,
+                    </div>
+                    <div className="pl-4">
+                      <span className="text-neutral-500 dark:text-neutral-400">coreStack:</span> [
+                      <span className="text-amber-500 dark:text-amber-400">"Java"</span>, <span className="text-amber-500 dark:text-amber-400">"React"</span>, <span className="text-amber-500 dark:text-amber-400">"Express"</span>
+                      ],
+                    </div>
+                    <div className="pl-4">
+                      <span className="text-neutral-500 dark:text-neutral-400">focusAreas:</span> [
+                      <span className="text-amber-500 dark:text-amber-400">"Full-Stack APIs"</span>, <span className="text-amber-500 dark:text-amber-400">"AI Agents"</span>
+                      ],
+                    </div>
+                    <div className="pl-4">
+                      <span className="text-neutral-500 dark:text-neutral-400">passionateAbout:</span> <span className="text-amber-500 dark:text-amber-400">"Scale, Automation & Clean Architecture"</span>
+                    </div>
+                    <div>&#125;;</div>
+
+                    <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800">
+                      <div className="text-emerald-600 dark:text-emerald-500 font-bold flex items-center gap-1">
+                        <span>&gt;</span>
+                        <span className="animate-pulse">n8n run automations --active</span>
+                      </div>
+                      <div className="text-[10px] text-neutral-500 dark:text-neutral-400 mt-1">
+                        [INFO] 3 autonomous workflows listening ...
+                      </div>
                     </div>
                   </div>
                 </div>

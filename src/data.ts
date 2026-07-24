@@ -138,14 +138,17 @@ export const SKILL_CATEGORIES: SkillCategory[] = [
     category: "Languages",
     items: [
       { name: "Java", level: 90 },
-      { name: "JavaScript", level: 92 },
+      { name: "JavaScript (ES6+)", level: 92 },
       { name: "Python", level: 85 },
-      { name: "SQL", level: 88 }
+      { name: "SQL", level: 88 },
+      { name: "HTML", level: 92 },
+      { name: "CSS", level: 88 }
     ]
   },
   {
     category: "Technologies & Frameworks",
     items: [
+      { name: "Bootstrap", level: 85 },
       { name: "React.js", level: 92 },
       { name: "Next.js", level: 88 },
       { name: "Node.js", level: 90 },
@@ -174,6 +177,13 @@ export const SKILL_CATEGORIES: SkillCategory[] = [
     ]
   },
   {
+    category: "Deployment & Hosting",
+    items: [
+      { name: "Vercel", level: 88 },
+      { name: "Render", level: 85 }
+    ]
+  },
+  {
     category: "Core CS Fundamentals",
     items: [
       { name: "Data Structures & Algorithms", level: 90 },
@@ -183,4 +193,11 @@ export const SKILL_CATEGORIES: SkillCategory[] = [
       { name: "Computer Networks", level: 84 }
     ]
   }
+];
+
+export const SOFT_SKILLS: string[] = [
+  "Problem-Solving",
+  "Project Management",
+  "Leadership",
+  "Teamwork"
 ];

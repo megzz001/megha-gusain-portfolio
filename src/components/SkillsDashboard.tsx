@@ -1,170 +1,142 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Search, Code2, Database, Library, Settings, Bot } from 'lucide-react';
-import { SKILL_CATEGORIES } from '../data';
+import { motion, type Variants } from 'motion/react';
+import { Code2, Users2, Lightbulb, Clock, UserCog, type LucideIcon } from 'lucide-react';
+import { SKILL_CATEGORIES, SOFT_SKILLS } from '../data';
+
+const TECHNICAL_SKILLS = SKILL_CATEGORIES
+  .filter((cat) => cat.category !== 'Core CS Fundamentals')
+  .flatMap((cat) => cat.items.map((item) => item.name));
+
+const SOFT_SKILL_ICONS: Record<string, LucideIcon> = {
+  'Problem-Solving': Lightbulb,
+  'Project Management': Clock,
+  'Leadership': UserCog,
+  'Teamwork': Users2,
+};
+
+const containerVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.05 },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 260, damping: 22 },
+  },
+};
 
 export default function SkillsDashboard() {
-  const [activeTab, setActiveTab] = useState("Languages");
-  const [searchQuery, setSearchQuery] = useState("");
-
-  // Map category names to helpful icons
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case "Languages":
-        return <Code2 className="h-4 w-4" />;
-      case "Technologies & Frameworks":
-        return <Library className="h-4 w-4" />;
-      case "AI & Automation":
-        return <Bot className="h-4 w-4" />;
-      case "Databases & Tools":
-        return <Database className="h-4 w-4" />;
-      case "Core CS Fundamentals":
-        return <Settings className="h-4 w-4" />;
-      default:
-        return <Code2 className="h-4 w-4" />;
-    }
-  };
-
-  // Level classification helper
-  const getLevelLabel = (level: number) => {
-    if (level >= 90) return "Expert / Fluent";
-    if (level >= 85) return "Advanced";
-    return "Competent";
-  };
-
-  // Find category list matching active search or category tab
-  const categoriesToRender = SKILL_CATEGORIES.map(category => {
-    if (searchQuery.trim() === "") {
-      return category.category === activeTab ? category : null;
-    } else {
-      const filteredItems = category.items.filter(item =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      return filteredItems.length > 0 ? { ...category, items: filteredItems } : null;
-    }
-  }).filter(Boolean) as typeof SKILL_CATEGORIES;
-
   return (
     <section id="skills" className="py-24 px-4 bg-white dark:bg-brand-bg-dark border-t border-neutral-100 dark:border-neutral-950 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Section Heading */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-          <div>
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-brand-accent">
-              Expertise
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 dark:text-white mt-1">
-              Technical Arsenal
-            </h2>
-          </div>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5 }}
+          className="mb-12"
+        >
+          <span className="text-xs font-mono font-bold uppercase tracking-widest text-brand-accent">
+            Expertise
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 dark:text-white mt-1">
+            Skills &amp; Strengths
+          </h2>
+        </motion.div>
 
-          {/* Search Box */}
-          <div className="relative w-full md:w-80">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-neutral-400">
-              <Search className="h-4 w-4" />
-            </span>
-            <input
-              type="text"
-              placeholder="Search skills..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-neutral-200 dark:border-brand-border-dark rounded-xl text-sm bg-neutral-50/50 dark:bg-neutral-900/40 text-neutral-800 dark:text-neutral-200 placeholder-neutral-400 focus:outline-none focus:border-brand-accent transition-colors"
-            />
-          </div>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        {/* Categories Tab Navigation (Only visible when not searching) */}
-        {searchQuery.trim() === "" && (
-          <div className="flex flex-wrap gap-2 mb-8 border-b border-neutral-100 dark:border-neutral-900 pb-4 overflow-x-auto no-scrollbar">
-            {SKILL_CATEGORIES.map((cat) => {
-              const isActive = activeTab === cat.category;
-              return (
-                <button
-                  key={cat.category}
-                  onClick={() => setActiveTab(cat.category)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono font-medium transition-all ${
-                    isActive
-                      ? "bg-brand-accent text-white shadow-md shadow-brand-accent/10"
-                      : "bg-neutral-50 dark:bg-neutral-900 border border-neutral-200/40 dark:border-neutral-800/60 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white"
-                  }`}
-                >
-                  {getCategoryIcon(cat.category)}
-                  <span>{cat.category}</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
+          {/* Technical Skills Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.5 }}
+            whileHover={{ y: -4 }}
+            className="rounded-2xl border border-border bg-card p-8 shadow-sm hover:shadow-lg hover:shadow-brand-accent/5 transition-shadow"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <motion.div
+                whileHover={{ rotate: 12, scale: 1.1 }}
+                transition={{ type: 'spring', stiffness: 300 }}
+                className="flex items-center justify-center h-9 w-9 rounded-lg bg-brand-accent/10 text-brand-accent"
+              >
+                <Code2 className="h-4 w-4" />
+              </motion.div>
+              <h3 className="text-xl font-display font-bold text-foreground">Technical Skills</h3>
+            </div>
 
-        {/* Skills Presentation Area */}
-        <div className="min-h-[220px]">
-          <AnimatePresence mode="wait">
             <motion.div
-              key={searchQuery ? "search" : activeTab}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.25 }}
-              className="space-y-8"
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              className="flex flex-wrap gap-2.5"
             >
-              {categoriesToRender.length === 0 ? (
-                <div className="text-center py-12 text-neutral-400 dark:text-neutral-500 font-mono text-sm">
-                  No skills matching "{searchQuery}" found in our database.
-                </div>
-              ) : (
-                categoriesToRender.map((catGroup) => (
-                  <div key={catGroup.category} className="space-y-4">
-                    {searchQuery.trim() !== "" && (
-                      <h3 className="text-xs font-mono uppercase tracking-widest text-neutral-400 dark:text-neutral-500 flex items-center gap-2">
-                        {getCategoryIcon(catGroup.category)}
-                        <span>{catGroup.category}</span>
-                      </h3>
-                    )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {catGroup.items.map((skill) => (
-                        <div
-                          key={skill.name}
-                          className="group relative p-5 rounded-xl border border-neutral-200/60 dark:border-brand-border-dark bg-white dark:bg-brand-card-dark hover:border-brand-accent/30 dark:hover:border-brand-accent/30 shadow-sm transition-all duration-300"
-                        >
-                          <div className="flex justify-between items-start mb-3">
-                            <span className="font-semibold text-neutral-800 dark:text-white text-sm group-hover:text-brand-accent transition-colors">
-                              {skill.name}
-                            </span>
-                            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
-                              {getLevelLabel(skill.level)}
-                            </span>
-                          </div>
-
-                          {/* Interactive skill slider bar */}
-                          <div className="relative w-full h-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${skill.level}%` }}
-                              transition={{ duration: 0.8, ease: "easeOut" }}
-                              className="absolute top-0 left-0 h-full bg-gradient-to-r from-brand-accent to-brand-teal rounded-full"
-                            />
-                          </div>
-
-                          <div className="flex justify-between items-center mt-2.5">
-                            <span className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500">
-                              Skill Index
-                            </span>
-                            <span className="text-[11px] font-mono font-semibold text-brand-accent dark:text-brand-teal">
-                              {skill.level}%
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))
-              )}
+              {TECHNICAL_SKILLS.map((skill) => (
+                <motion.span
+                  key={skill}
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.06, y: -2 }}
+                  className="px-4 py-2 rounded-lg border border-border bg-background text-sm font-medium text-foreground hover:border-brand-accent hover:text-brand-accent transition-colors cursor-default"
+                >
+                  {skill}
+                </motion.span>
+              ))}
             </motion.div>
-          </AnimatePresence>
-        </div>
+          </motion.div>
 
+          {/* Soft Skills Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            whileHover={{ y: -4 }}
+            className="rounded-2xl border border-border bg-card p-8 shadow-sm hover:shadow-lg hover:shadow-brand-teal/5 transition-shadow"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <motion.div
+                whileHover={{ rotate: 12, scale: 1.1 }}
+                transition={{ type: 'spring', stiffness: 300 }}
+                className="flex items-center justify-center h-9 w-9 rounded-lg bg-brand-teal/10 text-brand-teal"
+              >
+                <Users2 className="h-4 w-4" />
+              </motion.div>
+              <h3 className="text-xl font-display font-bold text-foreground">Soft Skills</h3>
+            </div>
+
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              className="space-y-3"
+            >
+              {SOFT_SKILLS.map((skill) => {
+                const Icon = SOFT_SKILL_ICONS[skill] ?? Lightbulb;
+                return (
+                  <motion.div
+                    key={skill}
+                    variants={itemVariants}
+                    whileHover={{ x: 4 }}
+                    className="flex items-center gap-3 px-5 py-4 rounded-xl bg-background border border-border hover:border-brand-teal/50 transition-colors"
+                  >
+                    <Icon className="h-4 w-4 text-brand-teal shrink-0" />
+                    <span className="font-medium text-foreground">{skill}</span>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          </motion.div>
+
+        </div>
       </div>
     </section>
   );
