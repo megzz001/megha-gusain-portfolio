@@ -65,7 +65,7 @@ export default function Navbar({ darkMode, toggleDarkMode, onPrintResume }: Navb
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-brand-accent text-white hover:bg-brand-accent/90 transition-all shadow-md shadow-brand-accent/10 hover:shadow-brand-accent/20"
               >
                 <Download className="h-4 w-4" />
-                <span>Resume / Print</span>
+                <span>Download Resume</span>
               </button>
             </div>
           </div>
@@ -117,7 +117,7 @@ export default function Navbar({ darkMode, toggleDarkMode, onPrintResume }: Navb
               className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold bg-brand-accent text-white hover:bg-brand-accent/90"
             >
               <Download className="h-4 w-4" />
-              <span>Resume / PDF</span>
+              <span>Download Resume</span>
             </button>
           </div>
         </motion.div>

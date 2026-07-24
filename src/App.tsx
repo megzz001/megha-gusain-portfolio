@@ -7,9 +7,10 @@ import ProjectsGallery from './components/ProjectsGallery';
 import ExperienceTimeline from './components/ExperienceTimeline';
 import ContactForm from './components/ContactForm';
 import ResumeTwinChat from './components/ResumeTwinChat';
-import PrintResumeSheet from './components/PrintResumeSheet';
 import { ME_INFO } from './data';
 import { Terminal, Shield, Cpu, ExternalLink } from 'lucide-react';
+
+const resumePdfUrl = new URL('../assets/MeghaTechnical2.pdf', import.meta.url).href;
 
 export default function App() {
   // Initialize dark mode state based on localStorage or system preferences
@@ -36,9 +37,14 @@ export default function App() {
     }
   }, [darkMode]);
 
-  // Handle triggering browser print layout
+  // Download the uploaded resume PDF
   const handlePrintResume = () => {
-    window.print();
+    const link = document.createElement('a');
+    link.href = resumePdfUrl;
+    link.download = 'MeghaTechnical2.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // Helper to trigger open of the chatbot widget
@@ -66,7 +72,7 @@ export default function App() {
         <Hero onChatClick={triggerAiChat} />
 
         {/* Main Content Area */}
-        <main className="relative z-10 max-w-7xl mx-auto">
+        <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* About Me Section */}
           <AboutMe />
 
@@ -84,7 +90,7 @@ export default function App() {
         </main>
 
         {/* Dynamic Footer Section */}
-        <footer className="border-t border-neutral-200 dark:border-brand-border-dark py-12 px-4 text-center text-neutral-500 dark:text-neutral-500 bg-white/40 dark:bg-brand-bg-dark/40 backdrop-blur-sm relative z-10">
+        <footer className="border-t border-neutral-200 dark:border-brand-border-dark py-12 px-4 sm:px-6 lg:px-8 text-center text-neutral-500 dark:text-neutral-500 bg-white/40 dark:bg-brand-bg-dark/40 backdrop-blur-sm relative z-10">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2 font-display font-bold text-sm text-neutral-800 dark:text-neutral-300">
               <Terminal className="h-4 w-4 text-brand-accent" />
@@ -121,9 +127,6 @@ export default function App() {
         {/* Interactive Floating AI Chat Twin Widget */}
         <ResumeTwinChat />
       </div>
-
-      {/* 2. Paper Document Segment (Only displayed during Print operations) */}
-      <PrintResumeSheet />
 
     </div>
   );

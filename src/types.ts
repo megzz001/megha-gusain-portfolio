@@ -13,6 +13,7 @@ export interface Project {
 
 export interface Experience {
   id: string;
+  type?: 'experience' | 'education';
   role: string;
   company: string;
   location: string;

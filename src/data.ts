@@ -4,7 +4,6 @@ export const ME_INFO = {
   name: "Megha Gusain",
   role: "Full-Stack Developer & AI Automation Engineer",
   email: "meghagusain03@gmail.com",
-  phone: "+91 98884 27804",
   location: "Chandigarh, India",
   linkedin: "https://linkedin.com/in/megha-gusain-27438437a",
   github: "https://github.com/megzz001",
@@ -41,24 +40,24 @@ export const PROJECTS: Project[] = [
     githubUrl: "https://github.com/megzz001/Full-Stack-AI-Resume-Analyzer-and-Interview-Question-Generator-using-GenAI"
   },
   {
-    id: "real-estate",
-    title: "Real Estate Marketplace",
+    id: "cloudware",
+    title: "CloudWare – Hierarchical File Management System",
     tech: ["React.js", "Node.js", "Express.js", "MongoDB", "Tailwind CSS", "MERN Stack"],
-    description: "A comprehensive full-stack property marketplace featuring real-time authentication, rich listings management, and advanced search filters.",
+    description: "Built a full-stack cloud storage application inspired by Google Drive with secure user authentication and hierarchical folder management.",
     highlights: [
-      "Built a full-stack property marketplace with authentication, listings, advanced search, and filtering.",
-      "Designed MongoDB schemas and REST APIs for secure property management.",
-      "Implemented responsive user interfaces and optimized backend performance.",
-      "Deployed scalable production-ready application using modern web technologies."
+      "Built a full-stack cloud storage application with secure user authentication.",
+      "Implemented hierarchical folder management with nested folders and file organization.",
+      "Designed MongoDB schemas and REST APIs for efficient file and folder operations.",
+      "Developed responsive React-based interfaces and optimized backend performance for scalability."
     ],
     details: [
-      "Created a seamless search and filtering engine allowing users to filter properties by location, price, size, and layout.",
-      "Features secure user authentication and property ownership verification dashboards.",
-      "Optimized database queries with MongoDB indexing, reducing list loading times by 40%.",
-      "Features a mobile-first responsive layout with custom image carousels and maps integrations."
+      "Applied recursive data structures and parent-child relationships to manage complex folder hierarchies.",
+      "Created secure user flows and scalable REST APIs for file and folder management.",
+      "Delivered a mobile-friendly interface inspired by cloud storage experiences.",
+      "Focused on clean data modeling and performance for large-scale organization workflows."
     ],
-    role: "Lead MERN Developer",
-    period: "Aug 2025 - Present",
+    role: "Full-Stack Developer",
+    period: "Feb 2026 – Mar 2026",
     githubUrl: "https://github.com/megzz001/cloudware-Hierarchical-File-Management-System"
   },
   {
@@ -86,7 +85,24 @@ export const PROJECTS: Project[] = [
 
 export const EXPERIENCE: Experience[] = [
   {
+    id: "tenjiku-intern",
+    type: "experience",
+    role: "Full Stack Web Developer Intern",
+    company: "TENJIKU INNOVATIONS PRIVATE LIMITED",
+    location: "Remote, India",
+    period: "Jun 2026 – Present",
+    description: "Developing and maintaining full-stack web applications using Next.js, React, TypeScript, Node.js, Express.js, MongoDB, and Tailwind CSS.",
+    highlights: [
+      "Developing and maintaining full-stack web applications using Next.js, React, TypeScript, Node.js, Express.js, MongoDB, and Tailwind CSS.",
+      "Building responsive and reusable UI components while ensuring cross-browser compatibility and mobile responsiveness.",
+      "Optimizing application performance through client-side caching, pagination, and efficient API integration.",
+      "Collaborating with senior developers using Git workflows, participating in code reviews, and implementing feature enhancements.",
+      "Designing and consuming RESTful APIs, troubleshooting production issues, and improving overall user experience."
+    ]
+  },
+  {
     id: "edu-cu",
+    type: "education",
     role: "B.E. in Computer Science and Engineering",
     company: "Chandigarh University",
     location: "Chandigarh, India",
@@ -100,6 +116,7 @@ export const EXPERIENCE: Experience[] = [
   },
   {
     id: "edu-ggmsss",
+    type: "education",
     role: "Intermediate (CBSE) - Science & Computer Science",
     company: "GGMSSS 18-C",
     location: "Chandigarh, India",

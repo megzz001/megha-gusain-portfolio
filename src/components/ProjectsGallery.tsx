@@ -41,26 +41,20 @@ export default function ProjectsGallery() {
             <rect x="142" y="177" width="110" height="6" rx="3" fill="currentColor" fillOpacity="0.2" />
           </svg>
         );
-      case "real-estate":
+      case "cloudware":
         return (
           <svg className="w-full h-full text-brand-teal" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="400" height="240" fill="currentColor" fillOpacity="0.03" />
-            {/* Grid layout mock */}
-            <rect x="25" y="25" width="165" height="110" rx="12" fill="currentColor" fillOpacity="0.06" />
-            <rect x="35" y="35" width="145" height="60" rx="8" fill="currentColor" fillOpacity="0.1" />
-            <rect x="35" y="105" width="110" height="6" rx="3" fill="currentColor" fillOpacity="0.2" />
-            <rect x="35" y="117" width="60" height="4" rx="2" fill="currentColor" fillOpacity="0.15" />
-
-            <rect x="210" y="25" width="165" height="110" rx="12" fill="currentColor" fillOpacity="0.06" />
-            <rect x="220" y="35" width="145" height="60" rx="8" fill="currentColor" fillOpacity="0.1" />
-            <rect x="220" y="105" width="110" height="6" rx="3" fill="currentColor" fillOpacity="0.2" />
-            <rect x="220" y="117" width="60" height="4" rx="2" fill="currentColor" fillOpacity="0.15" />
-
-            {/* Map sidebar or search */}
-            <rect x="25" y="155" width="350" height="60" rx="14" fill="currentColor" fillOpacity="0.04" stroke="currentColor" strokeOpacity="0.08" />
-            <circle cx="60" cy="185" r="14" fill="currentColor" fillOpacity="0.1" />
-            <rect x="88" y="181" width="140" height="8" rx="4" fill="currentColor" fillOpacity="0.25" />
-            <rect x="280" y="173" width="75" height="24" rx="8" fill="currentColor" fillOpacity="0.15" />
+            {/* Cloud storage layout mock */}
+            <rect x="35" y="45" width="330" height="150" rx="16" fill="currentColor" fillOpacity="0.06" stroke="currentColor" strokeOpacity="0.12" />
+            <rect x="60" y="72" width="120" height="70" rx="10" fill="currentColor" fillOpacity="0.1" />
+            <rect x="195" y="72" width="145" height="18" rx="6" fill="currentColor" fillOpacity="0.18" />
+            <rect x="195" y="100" width="110" height="10" rx="5" fill="currentColor" fillOpacity="0.12" />
+            <rect x="195" y="118" width="85" height="10" rx="5" fill="currentColor" fillOpacity="0.1" />
+            <path d="M90 110c10-25 42-35 60-15" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeOpacity="0.22" />
+            <circle cx="315" cy="145" r="28" fill="currentColor" fillOpacity="0.14" />
+            <path d="M300 145h30" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeOpacity="0.25" />
+            <path d="M315 130v30" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeOpacity="0.25" />
           </svg>
         );
       case "ai-blog":
@@ -100,7 +94,7 @@ export default function ProjectsGallery() {
   return (
     <section id="projects" className="py-24 px-4 bg-neutral-50/40 dark:bg-neutral-900/10 border-t border-neutral-100 dark:border-neutral-950 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Title block */}
         <div className="mb-16">
           <span className="text-xs font-mono font-bold uppercase tracking-widest text-brand-accent">
@@ -188,7 +182,7 @@ export default function ProjectsGallery() {
         {/* Full Interactive Case Study Modal Overlay */}
         <AnimatePresence>
           {selectedProject && (
-            <div 
+            <div
               className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto no-print"
               onKeyDown={handleKeyDown}
               tabIndex={0}
@@ -225,7 +219,7 @@ export default function ProjectsGallery() {
 
                 {/* Modal Body (Scrollable) */}
                 <div className="flex-1 overflow-y-auto py-6 space-y-6 pr-1">
-                  
+
                   {/* Metadata Row */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-neutral-50 dark:bg-neutral-950 font-mono text-xs">
                     <div>

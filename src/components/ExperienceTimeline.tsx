@@ -1,32 +1,32 @@
-import { GraduationCap, Calendar, MapPin, Award, CheckCircle } from 'lucide-react';
+import { Briefcase, GraduationCap, Calendar, MapPin, Award, CheckCircle } from 'lucide-react';
 import { EXPERIENCE, CERTIFICATIONS } from '../data';
 
 export default function ExperienceTimeline() {
   return (
     <section id="timeline" className="py-24 px-4 bg-white dark:bg-brand-bg-dark border-t border-neutral-100 dark:border-neutral-950 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Section Title */}
         <div className="mb-16">
           <span className="text-xs font-mono font-bold uppercase tracking-widest text-brand-accent">
             Journey
           </span>
           <h2 className="text-3xl sm:text-4xl font-display font-bold text-neutral-900 dark:text-white mt-1">
-            Education & Certifications
+            Experience & Education
           </h2>
         </div>
 
         {/* Dynamic Layout Split */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          
+
           {/* Timeline Section (col-span-7) */}
           <div className="lg:col-span-7 relative border-l border-neutral-200 dark:border-neutral-800 pl-6 sm:pl-8 ml-4 space-y-12">
             {EXPERIENCE.map((exp, idx) => (
               <div key={exp.id} className="relative group">
-                
+
                 {/* Visual Bullet Icon */}
                 <span className="absolute -left-[39px] sm:-left-[47px] top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-brand-accent group-hover:bg-brand-accent group-hover:text-white group-hover:border-brand-accent transition-all duration-300 shadow-sm">
-                  <GraduationCap className="h-4 w-4" />
+                  {exp.type === 'experience' ? <Briefcase className="h-4 w-4" /> : <GraduationCap className="h-4 w-4" />}
                 </span>
 
                 <div className="space-y-3">
