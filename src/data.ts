@@ -98,7 +98,6 @@ export const EXPERIENCE: Experience[] = [
     description: "Developing and maintaining full-stack web applications using Next.js, React, TypeScript, Node.js, Express.js, MongoDB, and Tailwind CSS.",
     highlights: [
       "Developing and maintaining full-stack web applications using Next.js, React, TypeScript, Node.js, Express.js, MongoDB, and Tailwind CSS.",
-      "Building responsive and reusable UI components while ensuring cross-browser compatibility and mobile responsiveness.",
       "Optimizing application performance through client-side caching, pagination, and efficient API integration.",
       "Collaborating with senior developers using Git workflows, participating in code reviews, and implementing feature enhancements.",
       "Designing and consuming RESTful APIs, troubleshooting production issues, and improving overall user experience."
@@ -113,7 +112,6 @@ export const EXPERIENCE: Experience[] = [
     period: "Aug 2022 - May 2026",
     description: "Pursuing Bachelor of Engineering with a special focus on software development, cloud technologies, data structures, and intelligent automation systems.",
     highlights: [
-      "Maintained a strong academic record with CGPA: 7.59",
       "Relevant Coursework: Data Structures & Algorithms, DBMS, OOP, Operating Systems, Computer Networks, Software Engineering, Cloud Computing",
       "Actively built real-world full-stack and AI-driven systems, proving leadership and execution capabilities."
     ]

@@ -141,10 +141,6 @@ export default function Hero({ onChatClick }: HeroProps) {
               className="grid grid-cols-3 gap-4 sm:gap-8 w-full max-w-md pt-6 mt-2 border-t border-neutral-200 dark:border-neutral-800"
             >
               <div>
-                <p className="text-2xl sm:text-3xl font-display font-bold text-neutral-900 dark:text-white">7.59</p>
-                <p className="text-xs font-mono text-neutral-500 dark:text-neutral-400 mt-1">CGPA</p>
-              </div>
-              <div>
                 <p className="text-2xl sm:text-3xl font-display font-bold text-neutral-900 dark:text-white">{PROJECTS.length}+</p>
                 <p className="text-xs font-mono text-neutral-500 dark:text-neutral-400 mt-1">Projects Shipped</p>
               </div>
@@ -194,11 +190,8 @@ export default function Hero({ onChatClick }: HeroProps) {
                       <span className="text-neutral-500 dark:text-neutral-400">education:</span> <span className="text-amber-500 dark:text-amber-400">"Chandigarh University"</span>,
                     </div>
                     <div className="pl-4">
-                      <span className="text-neutral-500 dark:text-neutral-400">cgpa:</span> <span className="text-indigo-500 dark:text-indigo-300">7.59</span>,
-                    </div>
-                    <div className="pl-4">
                       <span className="text-neutral-500 dark:text-neutral-400">coreStack:</span> [
-                      <span className="text-amber-500 dark:text-amber-400">"Java"</span>, <span className="text-amber-500 dark:text-amber-400">"React"</span>, <span className="text-amber-500 dark:text-amber-400">"Express"</span>
+                      <span className="text-amber-500 dark:text-amber-400">"Java"</span>, <span className="text-amber-500 dark:text-amber-400">"MERN"</span>, <span className="text-amber-500 dark:text-amber-400">"Python"</span>
                       ],
                     </div>
                     <div className="pl-4">
