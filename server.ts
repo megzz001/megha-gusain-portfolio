@@ -5,6 +5,7 @@ import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import { Resend } from "resend";
+import { SYSTEM_INSTRUCTION } from "./src/resumeKnowledge";
 
 const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || "127.0.0.1";
@@ -12,6 +13,13 @@ const HMR_PORT = Number(process.env.HMR_PORT || 24678);
 const MESSAGES_FILE = path.join(process.cwd(), "messages.json");
 const CONTACT_RECIPIENT_EMAIL = process.env.CONTACT_RECIPIENT_EMAIL || "meghagusain03@gmail.com";
 const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "Portfolio Contact Form <onboarding@resend.dev>";
+
+// Tried in order: if the preferred model is unavailable on the key, fall back to a stable one.
+const CHAT_MODELS = [process.env.GEMINI_MODEL || "gemini-3.5-flash", "gemini-2.5-flash", "gemini-2.0-flash"];
+
+// Keep the request payload bounded — the resume dossier is already in the system instruction,
+// so only recent turns are needed for conversational context.
+const MAX_HISTORY_TURNS = 20;
 
 // Lazy-initialized Gemini Client
 let aiClient: GoogleGenAI | null = null;
@@ -125,12 +133,21 @@ async function startServer() {
         return res.status(400).json({ error: "Messages array is required." });
       }
 
-      // Format messages into contents format for Gemini
-      // Map 'user' to 'user' and 'ai' to 'model'
-      const contents = messages.map((m: any) => ({
-        role: m.sender === "user" ? "user" : "model",
-        parts: [{ text: m.text }],
-      }));
+      // Format messages into contents format for Gemini.
+      // Map 'user' to 'user' and 'ai' to 'model', dropping anything without text.
+      const contents = messages
+        .filter((m: any) => typeof m?.text === "string" && m.text.trim().length > 0)
+        .slice(-MAX_HISTORY_TURNS)
+        .map((m: any) => ({
+          role: m.sender === "user" ? "user" : "model",
+          parts: [{ text: m.text }],
+        }));
+
+      // Gemini rejects a history that opens with a model turn, so trim the client's
+      // canned welcome message (and anything else) before the first real user turn.
+      while (contents.length > 0 && contents[0].role !== "user") {
+        contents.shift();
+      }
 
       // If last message isn't user, return bad request
       if (contents.length === 0 || contents[contents.length - 1].role !== "user") {
@@ -139,61 +156,50 @@ async function startServer() {
 
       // Check if API key is present
       if (!process.env.GEMINI_API_KEY) {
-        return res.json({
-          reply: "Hi there! I am Megha's AI Assistant. Currently, her Gemini API key is not configured in the Secrets panel, but I can tell you that she is an extremely talented full-stack engineer and AI automation specialist! Feel free to review her education, certifications, and projects on this page. If you'd like to test this chat fully, please configure the GEMINI_API_KEY in Settings > Secrets.",
+        return res.status(503).json({
+          error:
+            "Megha's AI twin isn't connected right now — the GEMINI_API_KEY is missing from the server's environment. Everything about her experience, projects, and skills is still available on this page.",
         });
       }
 
       const ai = getGeminiClient();
 
-      const systemInstruction = `You are the AI Twin and Professional Representative of Megha Gusain, a Computer Science Engineering student at Chandigarh University who specializes in Full-Stack Web Development, APIs, and AI-powered automation systems.
+      let lastError: any = null;
+      for (const model of CHAT_MODELS) {
+        try {
+          const response = await ai.models.generateContent({
+            model,
+            contents,
+            config: {
+              systemInstruction: SYSTEM_INSTRUCTION,
+              temperature: 0.6,
+              maxOutputTokens: 1024,
+            },
+          });
 
-Your objective is to answer questions about Megha's projects, experience, educational qualifications, technical skill-sets, and career interests. Always respond in a polite, highly professional, intelligent, confident, and warm tone. Speak as if you are Megha herself or her direct agent, keeping the conversation engaging.
+          const reply = response.text?.trim();
+          if (reply) {
+            return res.json({ reply, model });
+          }
+          lastError = new Error(`Model ${model} returned an empty response.`);
+        } catch (modelError: any) {
+          lastError = modelError;
+          console.error(`[chat] Model ${model} failed:`, modelError?.message || modelError);
+        }
+      }
 
-Megha's Core Background Data:
-- Name: Megha Gusain
-- Current Role: Full-Stack Developer & AI Automation Specialist (B.E. Student at Chandigarh University, Graduating May 2026, Current CGPA: 7.59).
-- Contact: meghagusain03@gmail.com | +91 98884 27804
-- Portfolios & Socials:
-  * GitHub: github.com/megzz001
-  * LinkedIn: linkedin.com/in/megha-gusain-27438437a
-  * LeetCode: leetcode.com/u/Megz_001
-- Technical Skills:
-  * Languages: Java, JavaScript, Python, SQL
-  * Core CS: Data Structures & Algorithms, OOP (Object-Oriented Programming), DBMS, OS (Operating Systems), Computer Networks, Software Engineering
-  * Web Technologies: React.js, Next.js, Node.js, Express.js, RESTful APIs, MERN Stack
-  * Databases: MySQL, MongoDB, Redis, PostgreSQL
-  * Tools: GitHub, Postman, MongoDB Atlas, Vercel, Render
-  * AI & Automation: LLMs, Prompt Engineering, LangChain, n8n Workflows, Agentic AI Systems
-- Key Highlighted Projects:
-  1. Gen AI Interview Preparation System (2026): A Node.js/Express/MongoDB platform that parses resumes & job descriptions to identify skill gaps, generate customized study plans, and provide simulated mock questions. Uses JWT & prompt engineering.
-  2. Real Estate Marketplace (MERN Stack - Aug 2025 to Present): A complete property trading hub with user auth, listing publishing, multi-parameter search/filtering, and optimized database queries.
-  3. Full Stack AI Blog Platform (Next.js/MongoDB/n8n - May 2025 to Jul 2025): An autonomous content writer system reducing human editorial effort by 80% via n8n automated flows, LangChain content builders, and Next.js ISR.
-- Certifications:
-  * IBM (Coursera) – Java Full Stack Developer Professional Certificate
-  * NPTEL (IIT Kanpur) – Cloud Computing
-  * Metacrafter – Blockchain Technology (Ethereum & Polygon)
-- Core Strengths & Interests: Financial technology (FinTech), scalable cloud-native architectures, data-driven systems, collaborative agile delivery, and end-to-end automation.
-
-Conversational Rules:
-1. Answer concisely. Do not write extremely long paragraphs unless detail is specifically requested. Use formatting (bullet points, bold text) to keep answers scannable.
-2. If asked about something unrelated to Megha's professional life (e.g. food, sports scores, generic history), gently and politely redirect the user back to asking about Megha's software engineering background and how she can add value to their team.
-3. Be enthusiastic about opportunities! If someone asks about hiring her, encourage them to use the contact form on the portfolio or send her an email at meghagusain03@gmail.com.`;
-
-      // Use gemini-3.5-flash as the default Basic Text model
-      const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: contents,
-        config: {
-          systemInstruction: systemInstruction,
-          temperature: 0.7,
-        },
-      });
-
-      return res.json({ reply: response.text || "I apologize, I could not formulate a reply. Please try asking again." });
+      throw lastError || new Error("No chat model produced a response.");
     } catch (error: any) {
       console.error("Error in AI Twin Chat API:", error);
-      return res.status(500).json({ error: "AI assistant service is currently unavailable. Please try again later." });
+      const status = Number(error?.status);
+      if (status === 429) {
+        return res.status(429).json({
+          error: "I'm getting a lot of questions right now and hit a rate limit. Please try again in a moment.",
+        });
+      }
+      return res.status(500).json({
+        error: "I couldn't reach the AI service just now. Please try again in a moment — or email Megha directly at meghagusain03@gmail.com.",
+      });
     }
   });
 

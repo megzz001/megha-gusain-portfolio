@@ -7,6 +7,50 @@ interface ResumeTwinChatProps {
   isInitiallyOpen?: boolean;
 }
 
+// The model answers in light markdown (headings, bullets, **bold**). Render just
+// enough of it so replies stay scannable instead of showing raw asterisks.
+function renderInline(text: string) {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith('**') && part.endsWith('**') && part.length > 4
+      ? <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong>
+      : <span key={i}>{part}</span>
+  );
+}
+
+function FormattedMessage({ text }: { text: string }) {
+  const lines = text.split('\n');
+
+  return (
+    <div className="space-y-1.5">
+      {lines.map((line, idx) => {
+        const trimmed = line.trim();
+        if (!trimmed) return null;
+
+        const heading = trimmed.match(/^#{1,6}\s+(.*)$/);
+        if (heading) {
+          return (
+            <p key={idx} className="font-display font-bold text-[13px] pt-1">
+              {renderInline(heading[1])}
+            </p>
+          );
+        }
+
+        const bullet = trimmed.match(/^(?:[-*•]|\d+\.)\s+(.*)$/);
+        if (bullet) {
+          return (
+            <div key={idx} className="flex gap-2 pl-0.5">
+              <span className="text-brand-accent leading-relaxed">&bull;</span>
+              <span className="flex-1">{renderInline(bullet[1])}</span>
+            </div>
+          );
+        }
+
+        return <p key={idx}>{renderInline(trimmed)}</p>;
+      })}
+    </div>
+  );
+}
+
 export default function ResumeTwinChat({ isInitiallyOpen = false }: ResumeTwinChatProps) {
   const [isOpen, setIsOpen] = useState(isInitiallyOpen);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -42,8 +86,20 @@ export default function ResumeTwinChat({ isInitiallyOpen = false }: ResumeTwinCh
     "How does she use n8n?",
   ];
 
+  const addAiMessage = (text: string) => {
+    setMessages(prev => [
+      ...prev,
+      {
+        id: `${Date.now()}-ai`,
+        sender: 'ai',
+        text,
+        timestamp: new Date()
+      }
+    ]);
+  };
+
   const handleSend = async (textToSend: string) => {
-    if (!textToSend.trim()) return;
+    if (!textToSend.trim() || loading) return;
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
@@ -71,40 +127,25 @@ export default function ResumeTwinChat({ isInitiallyOpen = false }: ResumeTwinCh
         body: JSON.stringify({ messages: chatHistory }),
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessages(prev => [
-          ...prev,
-          {
-            id: (Date.now() + 1).toString(),
-            sender: 'ai',
-            text: data.reply || "I apologize, I wasn't able to compile a clear reply.",
-            timestamp: new Date()
-          }
-        ]);
-      } else {
-        setMessages(prev => [
-          ...prev,
-          {
-            id: (Date.now() + 1).toString(),
-            sender: 'ai',
-            text: data.error || "The AI model encountered a temporary difficulty. Please verify connection.",
-            timestamp: new Date()
-          }
-        ]);
+      // The API always answers with JSON. Anything else means the request never
+      // reached the chat route (dev server not running, proxy misconfigured, etc.).
+      let data: { reply?: string; error?: string };
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error("The chat API returned a non-JSON response.");
       }
+
+      addAiMessage(
+        response.ok
+          ? data.reply || "I wasn't able to compile a clear reply on that one. Could you rephrase the question?"
+          : data.error || "I hit a temporary problem answering that. Please try again in a moment."
+      );
     } catch (err) {
       console.error("Chat error:", err);
-      setMessages(prev => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          sender: 'ai',
-          text: "I am unable to reach the server. Please verify if the server is running correctly on port 3000.",
-          timestamp: new Date()
-        }
-      ]);
+      addAiMessage(
+        "I can't reach my backend service at the moment, so I can't answer live questions. Megha's full experience, projects, and skills are all detailed on this page — or you can email her directly at meghagusain03@gmail.com."
+      );
     } finally {
       setLoading(false);
     }
@@ -171,7 +212,11 @@ export default function ResumeTwinChat({ isInitiallyOpen = false }: ResumeTwinCh
                           : 'bg-brand-accent text-white rounded-tr-none font-medium'
                       }`}
                     >
-                      <p className="whitespace-pre-wrap">{msg.text}</p>
+                      {isAi ? (
+                        <FormattedMessage text={msg.text} />
+                      ) : (
+                        <p className="whitespace-pre-wrap">{msg.text}</p>
+                      )}
                       <span
                         className={`text-[9px] font-mono block mt-1.5 text-right ${
                           isAi ? 'text-neutral-400' : 'text-white/60'
